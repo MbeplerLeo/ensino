@@ -111,7 +111,15 @@ try {
 
     [$status, $fetched] = apiRequest($baseUrl, 'GET', '/situacao/' . $created['id']);
     assertSameValue(200, $status, 'GET deve consultar o registro.');
-    assertSameValue($created, $fetched, 'GET deve retornar o registro criado.');
+    assertSameValue(
+        [
+            'nome' => $created['nome'],
+            'unidadeCurricular' => $created['unidadeCurricular'],
+            'aprovado' => $created['aprovado'],
+        ],
+        $fetched,
+        'GET deve retornar os campos definidos no exemplo do endpoint.',
+    );
 
     [$status, $updated] = apiRequest(
         $baseUrl,

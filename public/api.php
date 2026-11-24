@@ -67,22 +67,34 @@ function withRecords(callable $callback, bool $write = false): mixed
             throw new RuntimeException('Não foi possível ler o arquivo de dados.');
         }
         if ($contents === '') {
-            $records = [];
+            $data = ['situacoes' => [], 'endpoints' => []];
         } else {
             try {
-                $records = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+                $data = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
             } catch (JsonException $error) {
                 throw new RuntimeException('O arquivo de dados contém JSON inválido.', 0, $error);
             }
-            if (!is_array($records)) {
-                throw new RuntimeException('O arquivo de dados deve conter uma lista JSON.');
+            if (!is_array($data)) {
+                throw new RuntimeException('O arquivo de dados deve conter um objeto ou lista JSON.');
             }
+            if (array_is_list($data)) {
+                $data = ['situacoes' => $data, 'endpoints' => []];
+            }
+            if (!isset($data['situacoes']) || !is_array($data['situacoes'])) {
+                throw new RuntimeException('O arquivo de dados deve conter uma lista "situacoes".');
+            }
+            $data['endpoints'] ??= [];
+            $records =& $data['situacoes'];
         }
 
+        if ($contents === '') {
+            $records =& $data['situacoes'];
+        }
         $result = $callback($records);
         if ($write) {
+            $data['situacoes'] = array_values($records);
             $encoded = json_encode(
-                array_values($records),
+                $data,
                 JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR,
             );
             rewind($file);
@@ -186,7 +198,9 @@ function handleRequest(): never
             if ($record === null) {
                 respond(404, ['mensagem' => 'Registro não encontrado.']);
             }
-            respond(200, formatRecord($record));
+            $response = formatRecord($record);
+            unset($response['id']);
+            respond(200, $response);
         }
 
         if ($method === 'PUT') {
