@@ -4,7 +4,8 @@ API para cadastro e gerenciamento da situação acadêmica de estudantes em unid
 
 ## Integrantes
 
-- [Adicionar nome do(a) aluno(a)]
+- Leonardo Bepler Ferretti
+- 2 INFO
 
 ## Requisitos
 
