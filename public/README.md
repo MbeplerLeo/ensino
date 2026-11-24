@@ -2,7 +2,7 @@
 
 API para cadastro e gerenciamento da situação acadêmica de estudantes em unidades curriculares.
 
-## Integrantes
+## Aluno
 
 - Leonardo Bepler Ferretti
 - 2 INFO
